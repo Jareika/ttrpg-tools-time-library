@@ -1,0 +1,290 @@
+{
+  "version": 1,
+  "kind": "calendar",
+  "id": "gregorian-calendar",
+  "name": "Gregorian Calendar",
+  "definition": {
+    "id": "gregorian-calendar",
+    "name": "Gregorian Calendar",
+    "eraLabel": "BC",
+    "weekdays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "months": [
+      {
+        "id": "january",
+        "name": "January",
+        "days": 31,
+        "color": "#6ea8d9"
+      },
+      {
+        "id": "february",
+        "name": "February",
+        "days": 28,
+        "color": "#91b9dd"
+      },
+      {
+        "id": "march",
+        "name": "March",
+        "days": 31,
+        "color": "#8fbd70"
+      },
+      {
+        "id": "april",
+        "name": "April",
+        "days": 30,
+        "color": "#a8cc76"
+      },
+      {
+        "id": "may",
+        "name": "May",
+        "days": 31,
+        "color": "#b8d878"
+      },
+      {
+        "id": "june",
+        "name": "June",
+        "days": 30,
+        "color": "#d6cf74"
+      },
+      {
+        "id": "july",
+        "name": "July",
+        "days": 31,
+        "color": "#e2b35d"
+      },
+      {
+        "id": "august",
+        "name": "August",
+        "days": 31,
+        "color": "#df9c57"
+      },
+      {
+        "id": "september",
+        "name": "September",
+        "days": 30,
+        "color": "#c98c63"
+      },
+      {
+        "id": "october",
+        "name": "October",
+        "days": 31,
+        "color": "#b77866"
+      },
+      {
+        "id": "november",
+        "name": "November",
+        "days": 30,
+        "color": "#917a9f"
+      },
+      {
+        "id": "december",
+        "name": "December",
+        "days": 31,
+        "color": "#718db8"
+      }
+    ],
+    "leapMonths": [],
+    "leapDays": [],
+    "intercalaryDays": [
+      {
+        "id": "named-day-1",
+        "name": "Leap Day",
+        "insertAfterMonthIndex": 1,
+        "order": 2,
+        "weekdayMode": "normal",
+        "displayPosition": "after-previous-month",
+        "cycleYears": 4,
+        "activeYearPositions": [
+          4
+        ],
+        "skipYearsDivisibleBy": [
+          100
+        ]
+      },
+      {
+        "id": "leap-day-2",
+        "name": "Gregorian Century Correction",
+        "insertAfterMonthIndex": 1,
+        "order": 2,
+        "weekdayMode": "normal",
+        "displayPosition": "after-previous-month",
+        "cycleYears": 400,
+        "activeYearPositions": [
+          400
+        ],
+        "skipYearsDivisibleBy": []
+      }
+    ],
+    "weatherProfile": {
+      "mode": "calendar",
+      "climateYearLength": 360,
+      "baseOffsetDays": 0,
+      "cycleReset": "intercalation-cycle"
+    },
+    "eras": [
+      {
+        "id": "bc",
+        "name": "Before Christ",
+        "shortName": "BC",
+        "startYear": -66000000,
+        "startMonthIndex": 0,
+        "startDay": 1,
+        "endYear": -1,
+        "endMonthIndex": 11,
+        "endDay": 31
+      },
+      {
+        "id": "ce",
+        "name": "Common Era",
+        "shortName": "CE",
+        "startYear": 1,
+        "startMonthIndex": 0,
+        "startDay": 1
+      }
+    ],
+    "moons": [
+      {
+        "id": "moon",
+        "name": "Moon",
+        "cycleDays": 29.530588853,
+        "offsetDays": 7.3956337778,
+        "cycleAnchor": "absolute",
+        "color": "#c9cccf",
+        "phaseCount": 8,
+        "size": 40,
+        "phaseImages": [
+          {
+            "phaseIndex": 0,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/New Moon.webp"
+          },
+          {
+            "phaseIndex": 1,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Waxing Crescent.webp"
+          },
+          {
+            "phaseIndex": 2,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/First Quarter.webp"
+          },
+          {
+            "phaseIndex": 3,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Waxing Gibbous.webp"
+          },
+          {
+            "phaseIndex": 4,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Full Moon.webp"
+          },
+          {
+            "phaseIndex": 5,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Waning Gibbous.webp"
+          },
+          {
+            "phaseIndex": 6,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Last Quarter.webp"
+          },
+          {
+            "phaseIndex": 7,
+            "imageRef": "TTRPG Tools/Time/gregorian-calendar/Waning Crescent.webp"
+          }
+        ],
+        "phaseLabels": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      }
+    ],
+    "yearNames": [],
+    "namedWeeks": [],
+    "monthWeekdayMode": "continuous",
+    "startWeekdayIndex": 0,
+    "yearDisplay": {
+      "negativeYearsMode": "absolute",
+      "largeYearFormat": "plain",
+      "eraYearMode": "absolute"
+    },
+    "seasons": [
+      {
+        "id": "spring",
+        "name": "Spring",
+        "startDay": 1,
+        "endDay": 90,
+        "color": "#a7d36d"
+      },
+      {
+        "id": "summer",
+        "name": "Summer",
+        "startDay": 91,
+        "endDay": 180,
+        "color": "#e2b35d"
+      },
+      {
+        "id": "autumn",
+        "name": "Autumn",
+        "startDay": 181,
+        "endDay": 270,
+        "color": "#d98859"
+      },
+      {
+        "id": "winter",
+        "name": "Winter",
+        "startDay": 271,
+        "endDay": 360,
+        "color": "#7fa8d8"
+      }
+    ],
+    "time": {
+      "enabled": true,
+      "hoursPerDay": 24,
+      "minutesPerHour": 60
+    }
+  },
+  "state": {
+    "activeView": "year",
+    "todayDate": {
+      "year": 2026,
+      "monthIndex": 7,
+      "day": 25
+    },
+    "cursorDate": {
+      "year": 2026,
+      "monthIndex": 7,
+      "day": 25
+    },
+    "showEraDescription": false
+  },
+  "linkedTagPackIds": [],
+  "linkedCalendarIds": [
+    "lunisolar"
+  ],
+  "linkedWeatherPackIds": [],
+  "weatherEnabled": false,
+  "defaultWeatherPackId": "general",
+  "autoGenerateLinkedWeatherReferences": false,
+  "timeline": {
+    "name": "Travelbook",
+    "showMoons": true,
+    "gridRows": 2,
+    "colors": {
+      "bg": "#ffe5cc",
+      "accent": "#f79940",
+      "hover": "#ffd79e",
+      "title": "#f75722",
+      "date": "#cd683c"
+    }
+  },
+  "bannerImageRef": "TTRPG Tools/Time/gregorian-calendar/Banner.webp",
+  "markers": [],
+  "description": "The Gregorian calendar is an internationally used solar calendar introduced in 1582 to correct inaccuracies in the Julian calendar. It aligns the calendar year with Earth’s orbit around the Sun by using a system of leap years, making it the world’s dominant civil calendar."
+}

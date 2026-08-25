@@ -2,12 +2,65 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "id": "gregorian-calendar",
+      "kind": "calendar",
+      "name": "Gregorian Calendar",
+      "description": "Example with Gregorian leap years, a banner image, and eight moon-phase images.",
+      "author": "Jareika",
+      "license": "CC0-1.0",
+      "language": "en",
+      "tags": [
+        "gregorian"
+      ],
+      "monthCount": 12,
+      "weekdayCount": 7,
+      "file": "calendars/gregorian-calendar.calendar.json",
+      "assets": [
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Banner.webp",
+          "file": "assets/gregorian-calendar/Banner.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/New Moon.webp",
+          "file": "assets/gregorian-calendar/New Moon.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Waxing Crescent.webp",
+          "file": "assets/gregorian-calendar/Waxing Crescent.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/First Quarter.webp",
+          "file": "assets/gregorian-calendar/First Quarter.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Waxing Gibbous.webp",
+          "file": "assets/gregorian-calendar/Waxing Gibbous.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Full Moon.webp",
+          "file": "assets/gregorian-calendar/Full Moon.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Waning Gibbous.webp",
+          "file": "assets/gregorian-calendar/Waning Gibbous.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Last Quarter.webp",
+          "file": "assets/gregorian-calendar/Last Quarter.webp"
+        },
+        {
+          "ref": "TTRPG Tools/Time/gregorian-calendar/Waning Crescent.webp",
+          "file": "assets/gregorian-calendar/Waning Crescent.webp"
+        }
+      ]
+    },
+    {
       "id": "dvl-kalender",
       "kind": "calendar",
       "name": "Die verbotenen Lande",
       "description": "Ein Kalender für Kampagnen in den verbotenen Landen.",
       "author": "Jareika",
-      "license": "CC0",
+      "license": "CC0-1.0",
 	  "language": "de",
       "tags": ["Die-Verbotenen-Lande", "DvL", "fantasy"],
       "monthCount": 8,
