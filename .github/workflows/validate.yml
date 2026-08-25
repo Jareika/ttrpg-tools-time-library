@@ -1,0 +1,32 @@
+name: Validate community library
+
+on:
+  pull_request:
+    paths:
+      - "index.json"
+      - "calendars/**"
+      - "weather-packs/**"
+      - "scripts/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "index.json"
+      - "calendars/**"
+      - "weather-packs/**"
+      - "scripts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate index and JSON files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate
+        run: node scripts/validate-library.mjs

@@ -1,0 +1,60 @@
+name: Publish community library
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "index.json"
+      - "index.html"
+      - ".nojekyll"
+      - "calendars/**"
+      - "weather-packs/**"
+      - "scripts/**"
+      - ".github/workflows/pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate library
+        run: node scripts/validate-library.mjs
+
+      - name: Build static artifact
+        run: |
+          mkdir -p site
+          cp index.html site/index.html
+          cp index.json site/index.json
+          cp .nojekyll site/.nojekyll
+          cp -R calendars site/calendars
+          cp -R weather-packs site/weather-packs
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
