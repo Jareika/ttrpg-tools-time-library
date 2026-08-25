@@ -16,7 +16,7 @@ function readJson(filePath) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
-    fail(`Ungültige JSON-Datei: ${path.relative(ROOT, filePath)} (${error.message})`);
+    fail(`Invalid JSON file: ${path.relative(ROOT, filePath)} (${error.message})`);
     return null;
   }
 }
@@ -35,75 +35,142 @@ function isPositiveInteger(value) {
 
 function resolveEntryFile(entry, index) {
   if (!isNonEmptyString(entry.file)) {
-    fail(`entries[${index}]: "file" fehlt.`);
+    fail(`entries[${index}]: missing "file".`);
     return null;
   }
 
   if (entry.file.startsWith("/") || entry.file.includes("\\") || entry.file.includes("..")) {
-    fail(`entries[${index}]: Ungültiger Dateipfad "${entry.file}".`);
+    fail(`entries[${index}]: invalid file path "${entry.file}".`);
     return null;
   }
 
   const absolutePath = path.resolve(ROOT, entry.file);
 
   if (!absolutePath.startsWith(`${ROOT}${path.sep}`)) {
-    fail(`entries[${index}]: Dateipfad verlässt das Repository.`);
+    fail(`entries[${index}]: file path escapes the repository.`);
     return null;
   }
 
   if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
-    fail(`entries[${index}]: Datei existiert nicht: "${entry.file}".`);
+    fail(`entries[${index}]: file does not exist: "${entry.file}".`);
     return null;
   }
 
   return absolutePath;
 }
 
-function hasUnsupportedCalendarAssets(calendar) {
+function getCalendarAssetRefs(calendar) {
   const definition = calendar.definition ?? {};
+  const refs = new Set();
 
   if (isNonEmptyString(calendar.bannerImageRef)) {
-    return true;
+    refs.add(calendar.bannerImageRef);
   }
 
-  if (
-    Array.isArray(definition.intercalaryDays) &&
-    definition.intercalaryDays.some((day) => isNonEmptyString(day.imageRef))
-  ) {
-    return true;
+  if (Array.isArray(definition.intercalaryDays)) {
+    definition.intercalaryDays.forEach((day) => {
+      if (isNonEmptyString(day.imageRef)) {
+        refs.add(day.imageRef);
+      }
+    });
   }
 
-  return (
-    Array.isArray(definition.moons) &&
-    definition.moons.some(
-      (moon) =>
-        Array.isArray(moon.phaseImages) &&
-        moon.phaseImages.length > 0
-    )
-  );
+  if (Array.isArray(definition.moons)) {
+    definition.moons.forEach((moon) => {
+      if (!Array.isArray(moon.phaseImages)) {
+        return;
+      }
+
+      moon.phaseImages.forEach((phaseImage) => {
+        if (isNonEmptyString(phaseImage.imageRef)) {
+          refs.add(phaseImage.imageRef);
+        }
+      });
+    });
+  }
+
+  return refs;
+}
+
+function validateAssets(entry, index) {
+  if (entry.assets === undefined) {
+    return new Set();
+  }
+
+  if (!Array.isArray(entry.assets)) {
+    fail(`entries[${index}]: "assets" must be an array.`);
+    return new Set();
+  }
+
+  const refs = new Set();
+
+  entry.assets.forEach((asset, assetIndex) => {
+    if (!asset || typeof asset !== "object" || Array.isArray(asset)) {
+      fail(`entries[${index}].assets[${assetIndex}]: asset must be an object.`);
+      return;
+    }
+
+    if (!isNonEmptyString(asset.ref)) {
+      fail(`entries[${index}].assets[${assetIndex}]: missing "ref".`);
+      return;
+    }
+
+    if (
+      asset.ref.startsWith("/") ||
+      asset.ref.includes("\\") ||
+      asset.ref.includes("..")
+    ) {
+      fail(`entries[${index}].assets[${assetIndex}]: invalid reference "${asset.ref}".`);
+      return;
+    }
+
+    if (refs.has(asset.ref)) {
+      fail(`entries[${index}].assets[${assetIndex}]: duplicate reference "${asset.ref}".`);
+      return;
+    }
+
+    refs.add(asset.ref);
+
+    const file = resolveEntryFile(
+      { file: asset.file },
+      `${index}.assets[${assetIndex}]`
+    );
+
+    if (!file) {
+      return;
+    }
+
+    if (!asset.file.startsWith("assets/")) {
+      fail(
+        `entries[${index}].assets[${assetIndex}]: asset files must be located under "assets/".`
+      );
+    }
+  });
+
+  return refs;
 }
 
 function validateCalendar(entry, file, index) {
   if (!entry.file.endsWith(".calendar.json")) {
-    fail(`entries[${index}]: Kalenderdateien müssen auf ".calendar.json" enden.`);
+    fail(`entries[${index}]: calendar files must end in ".calendar.json".`);
   }
 
   const calendar = readJson(file);
   if (!calendar) return;
 
   if (calendar.kind !== "calendar") {
-    fail(`entries[${index}]: "${entry.file}" ist keine CalendarFile.`);
+    fail(`entries[${index}]: "${entry.file}" is not a CalendarFile.`);
   }
 
   if (calendar.id !== entry.id) {
     fail(
-      `entries[${index}]: Index-ID "${entry.id}" stimmt nicht mit Calendar-ID "${calendar.id}" überein.`
+      `entries[${index}]: index id "${entry.id}" does not match calendar id "${calendar.id}".`
     );
   }
 
   if (calendar.definition?.id !== entry.id) {
     fail(
-      `entries[${index}]: definition.id in "${entry.file}" muss "${entry.id}" sein.`
+      `entries[${index}]: definition.id in "${entry.file}" must be "${entry.id}".`
     );
   }
 
@@ -111,43 +178,56 @@ function validateCalendar(entry, file, index) {
   const weekdays = calendar.definition?.weekdays;
 
   if (!Array.isArray(months) || months.length === 0) {
-    fail(`entries[${index}]: Kalender benötigt mindestens einen regulären Monat.`);
+    fail(`entries[${index}]: calendar requires at least one regular month.`);
   } else if (entry.monthCount !== months.length) {
     fail(
-      `entries[${index}]: monthCount (${entry.monthCount}) stimmt nicht mit Monaten (${months.length}) überein.`
+      `entries[${index}]: monthCount (${entry.monthCount}) does not match the number of months (${months.length}).`
     );
   }
 
   if (!Array.isArray(weekdays) || weekdays.length === 0) {
-    fail(`entries[${index}]: Kalender benötigt mindestens einen Wochentag.`);
+    fail(`entries[${index}]: calendar requires at least one weekday.`);
   } else if (entry.weekdayCount !== weekdays.length) {
     fail(
-      `entries[${index}]: weekdayCount (${entry.weekdayCount}) stimmt nicht mit Wochentagen (${weekdays.length}) überein.`
+      `entries[${index}]: weekdayCount (${entry.weekdayCount}) does not match the number of weekdays (${weekdays.length}).`
     );
   }
 
-  if (hasUnsupportedCalendarAssets(calendar)) {
-    fail(
-      `entries[${index}]: Community-Kalender dürfen aktuell keine Banner-, Mondphasen- oder Interkalartags-Bilder enthalten.`
-    );
-  }
+  const declaredAssetRefs = validateAssets(entry, index);
+  const calendarAssetRefs = getCalendarAssetRefs(calendar);
+
+  calendarAssetRefs.forEach((ref) => {
+    if (!declaredAssetRefs.has(ref)) {
+      fail(
+        `entries[${index}]: calendar asset reference "${ref}" is missing from "assets".`
+      );
+    }
+  });
+
+  declaredAssetRefs.forEach((ref) => {
+    if (!calendarAssetRefs.has(ref)) {
+      fail(
+        `entries[${index}]: asset "${ref}" is not used by the calendar.`
+      );
+    }
+  });
 }
 
 function validateWeatherPack(entry, file, index) {
   if (!entry.file.endsWith(".weather-pack.json")) {
-    fail(`entries[${index}]: Wetterpack-Dateien müssen auf ".weather-pack.json" enden.`);
+    fail(`entries[${index}]: weather-pack files must end in ".weather-pack.json".`);
   }
 
   const pack = readJson(file);
   if (!pack) return;
 
   if (pack.kind !== "weather-pack") {
-    fail(`entries[${index}]: "${entry.file}" ist kein WeatherPackFile.`);
+    fail(`entries[${index}]: "${entry.file}" is not a WeatherPackFile.`);
   }
 
   if (pack.id !== entry.id) {
     fail(
-      `entries[${index}]: Index-ID "${entry.id}" stimmt nicht mit Weather-Pack-ID "${pack.id}" überein.`
+      `entries[${index}]: index id "${entry.id}" does not match weather-pack id "${pack.id}".`
     );
   }
 
@@ -155,7 +235,7 @@ function validateWeatherPack(entry, file, index) {
 
   if (entry.monthCount !== profiles.length) {
     fail(
-      `entries[${index}]: monthCount (${entry.monthCount}) stimmt nicht mit Monatsprofilen (${profiles.length}) überein.`
+      `entries[${index}]: monthCount (${entry.monthCount}) does not match the number of month profiles (${profiles.length}).`
     );
   }
 }
@@ -167,11 +247,11 @@ if (!index) {
 }
 
 if (index.schemaVersion !== 1) {
-  fail('index.json: "schemaVersion" muss 1 sein.');
+  fail('index.json: "schemaVersion" must be 1.');
 }
 
 if (!Array.isArray(index.entries)) {
-  fail('index.json: "entries" muss ein Array sein.');
+  fail('index.json: "entries" must be an array.');
 } else {
   const ids = new Set();
   const files = new Set();
@@ -180,45 +260,52 @@ if (!Array.isArray(index.entries)) {
     const prefix = `entries[${indexNumber}]`;
 
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-      fail(`${prefix}: Eintrag muss ein Objekt sein.`);
+      fail(`${prefix}: entry must be an object.`);
       return;
     }
 
     if (!isNonEmptyString(entry.id)) {
-      fail(`${prefix}: "id" fehlt.`);
+      fail(`${prefix}: missing "id".`);
     } else if (ids.has(entry.id)) {
-      fail(`${prefix}: doppelte ID "${entry.id}".`);
+      fail(`${prefix}: duplicate id "${entry.id}".`);
     } else {
       ids.add(entry.id);
     }
 
     if (entry.kind !== "calendar" && entry.kind !== "weather-pack") {
-      fail(`${prefix}: "kind" muss "calendar" oder "weather-pack" sein.`);
+      fail(`${prefix}: "kind" must be "calendar" or "weather-pack".`);
     }
 
     for (const field of ["name", "description", "author", "license"]) {
       if (!isNonEmptyString(entry[field])) {
-        fail(`${prefix}: "${field}" fehlt oder ist leer.`);
+        fail(`${prefix}: "${field}" is missing or empty.`);
       }
+    }
+	
+    if (
+      !isNonEmptyString(entry.language) ||
+      !/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(entry.language)
+    ) {
+      fail(`${prefix}: "language" must be a valid language code, for example "de" or "en".`);
     }
 
     if (!Array.isArray(entry.tags) || entry.tags.some((tag) => !isNonEmptyString(tag))) {
-      fail(`${prefix}: "tags" muss ein String-Array sein.`);
+      fail(`${prefix}: "tags" must be an array of strings.`);
     }
 
     if (!isNonNegativeInteger(entry.monthCount)) {
-      fail(`${prefix}: "monthCount" muss eine ganze Zahl ab 0 sein.`);
+      fail(`${prefix}: "monthCount" must be a non-negative integer.`);
     }
 
     if (entry.kind === "calendar" && !isPositiveInteger(entry.weekdayCount)) {
-      fail(`${prefix}: Kalender benötigen "weekdayCount" größer als 0.`);
+      fail(`${prefix}: calendar entries require a "weekdayCount" greater than 0.`);
     }
 
     const file = resolveEntryFile(entry, indexNumber);
     if (!file) return;
 
     if (files.has(entry.file)) {
-      fail(`${prefix}: Datei "${entry.file}" wird mehrfach im Index verwendet.`);
+      fail(`${prefix}: file "${entry.file}" is used more than once in the index.`);
       return;
     }
 
@@ -235,8 +322,12 @@ if (!Array.isArray(index.entries)) {
 }
 
 if (errors > 0) {
-  console.error(`\nValidierung fehlgeschlagen: ${errors} Fehler.`);
+  console.error(`\nValidation failed: ${errors} error${errors === 1 ? "" : "s"}.`);
   process.exit(1);
 }
 
-console.log(`✓ Community-Library valide (${index.entries.length} Einträge).`);
+console.log(
+  `✓ Community library is valid (${index.entries.length} ${
+    index.entries.length === 1 ? "entry" : "entries"
+  }).`
+);

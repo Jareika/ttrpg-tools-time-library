@@ -8,10 +8,17 @@
       "description": "Ein Kalender für Kampagnen in den verbotenen Landen.",
       "author": "Jareika",
       "license": "CC0",
+	  "language": "de",
       "tags": ["Die-Verbotenen-Lande", "DvL", "fantasy"],
       "monthCount": 8,
       "weekdayCount": 5,
-      "file": "calendars/dvl-kalender.calendar.json"
+      "file": "calendars/dvl-kalender.calendar.json",
+      "assets": [
+        {
+          "ref": "z_Attachments/Kalender/Banner Beige.webp",
+          "file": "assets/dvl-kalender/Banner Beige.webp"
+        }
+      ]
     }
   ]
 }

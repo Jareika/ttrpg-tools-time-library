@@ -11,10 +11,15 @@ Thank you for contributing a calendar or weather pack.
 - `id` in `index.json` must match the JSON file id.
 - Add a clear description, author name, license, tags and month count.
 - Do not add private vault paths.
-- Community calendars currently cannot include:
+- Community calendars may include:
   - banner images
   - moon phase images
   - named-day images
+  when every asset is stored in `assets/` and declared in the calendar's
+  `assets` array in `index.json`.
+- Do not use local or private vault paths. Calendar image references must be
+  logical repository-relative references such as:
+  `assets/my-calendar/moons/full-moon.webp`.
 - Do not include copyrighted content unless you have permission or a compatible license.
 
 To clarify: a standard calendar structure does not create copyright issues, even if it comes from a fantasy setting. The following elements are generally safe to use:

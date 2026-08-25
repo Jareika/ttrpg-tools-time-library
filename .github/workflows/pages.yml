@@ -10,6 +10,7 @@ on:
       - ".nojekyll"
       - "calendars/**"
       - "weather-packs/**"
+      - "assets/**"
       - "scripts/**"
       - ".github/workflows/pages.yml"
 
@@ -40,6 +41,9 @@ jobs:
           fi
           if [ -d weather-packs ]; then
             cp -R weather-packs site/weather-packs
+          fi
+          if [ -d assets ]; then
+            cp -R assets site/assets
           fi
 
       - name: Configure GitHub Pages
