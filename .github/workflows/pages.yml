@@ -35,8 +35,12 @@ jobs:
           cp index.html site/index.html
           cp index.json site/index.json
           cp .nojekyll site/.nojekyll
-          cp -R calendars site/calendars
-          cp -R weather-packs site/weather-packs
+          if [ -d calendars ]; then
+            cp -R calendars site/calendars
+          fi
+          if [ -d weather-packs ]; then
+            cp -R weather-packs site/weather-packs
+          fi
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
